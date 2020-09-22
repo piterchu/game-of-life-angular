@@ -1,17 +1,17 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AppService } from './app.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-
   title = 'Game-of-life-angular';
   pixelSize = 4;
   numCells = 160;
 
-  @ViewChild('canvas', {static: true})
+  @ViewChild('canvas', { static: true })
   canvas: ElementRef<HTMLCanvasElement>;
 
   private dataArray: Array<Array<number>>;
@@ -23,16 +23,15 @@ export class AppComponent implements OnInit {
     this.context = this.canvas.nativeElement.getContext('2d');
     this.dataArray = this.buildInitialArray();
 
-    // this.randomlyPopulate(this.dataArray);
+    this.randomlyPopulate(this.dataArray);
     this.manualSetup(this.dataArray);
     this.display(this.dataArray);
 
-    setInterval(
-      () => {
-        const newArr = this.computeNextGeneration(this.dataArray);
-        this.display(newArr);
-        this.dataArray = newArr;
-      }, 100);
+    setInterval(() => {
+      const newArr = this.computeNextGeneration(this.dataArray);
+      this.display(newArr);
+      this.dataArray = newArr;
+    }, 100);
   }
 
   private buildInitialArray(): Array<Array<number>> {
@@ -57,7 +56,12 @@ export class AppComponent implements OnInit {
 
   drawCell(x, y, alive): void {
     this.context.beginPath();
-    this.context.rect(x * this.pixelSize, y * this.pixelSize, this.pixelSize, this.pixelSize);
+    this.context.rect(
+      x * this.pixelSize,
+      y * this.pixelSize,
+      this.pixelSize,
+      this.pixelSize
+    );
     this.context.fillStyle = alive ? 'black' : '#EEE';
     this.context.fill();
   }
@@ -105,14 +109,15 @@ export class AppComponent implements OnInit {
     this.dataArray[86][70] = 1;
     this.dataArray[87][70] = 1;
     this.dataArray[88][70] = 1;
-
   }
 
-  computeNextGeneration(arr): Array<Array<number>> {
-    // clear existing data
-    const newArr = this.buildInitialArray();
+  computeNextGeneration(arr: Array<Array<number>>): Array<Array<number>> {
+    const newArr: Array<Array<number>> = this.buildInitialArray();
+    for (let i = 0; i < this.numCells; i++) {
+      for (let j = 0; j < this.numCells; j++) {
+        newArr[i][j] = AppService.findNeighbours(arr, i, j);
+      }
+    }
     return newArr;
   }
-
-
 }
